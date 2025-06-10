@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CutOut - Remoção de Fundo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .upload-area {
+            border: 3px dashed #ddd;
+            border-radius: 15px;
+            padding: 60px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #f0f3ff;
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            font-size: 4rem;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .upload-text {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .upload-subtext {
+            color: #999;
+            font-size: 0.9rem;
+        }
+        
+        #file-input {
+            display: none;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .preview-area {
+            margin-top: 40px;
+            display: none;
+        }
+        
+        .preview-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        .preview-item {
+            text-align: center;
+        }
+        
+        .preview-item h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .preview-item img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .result-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .result-info h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .result-info p {
+            color: #666;
+            margin: 5px 0;
+        }
+        
+        .ai-status {
+            background: #e8f4fd;
+            border: 1px solid #b8daff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .ai-status h4 {
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+        
+        .ai-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .ai-badge.available {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .ai-badge.unavailable {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .confidence-bar {
+            background: #f0f0f0;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #28a745, #20c997);
+            transition: width 0.3s ease;
+        }
+        
+        .error {
+            color: #e74c3c;
+            background: #fdf2f2;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .success {
+            color: #27ae60;
+            background: #f2fbf6;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #27ae60;
+        }
+        
+        @media (max-width: 768px) {
+            .preview-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 CutOut</h1>
+            <p>Remova o fundo das suas imagens automaticamente</p>
+        </div>
+        
+        <div class="ai-status" id="ai-status" style="display: none;">
+            <h4>🤖 Status da IA</h4>
+            <div id="ai-capabilities"></div>
+        </div>
+        
+        <div class="upload-area" id="upload-area">
+            <div class="upload-icon">📸</div>
+            <div class="upload-text">Arraste sua imagem aqui</div>
+            <div class="upload-subtext">ou clique para selecionar</div>
+            <div class="upload-subtext">Formatos: JPEG, JPG, PNG • Máximo: 10MB</div>
+            <input type="file" id="file-input" accept=".jpg,.jpeg,.png" />
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Processando sua imagem...</p>
+        </div>
+        
+        <div class="preview-area" id="preview-area">
+            <div class="preview-container">
+                <div class="preview-item">
+                    <h3>📷 Imagem Original</h3>
+                    <img id="original-image" src="" alt="Imagem Original" />
+                </div>
+                <div class="preview-item">
+                    <h3>✨ Sem Fundo</h3>
+                    <img id="processed-image" src="" alt="Imagem Processada" />
+                </div>
+            </div>
+            
+            <div class="result-info" id="result-info">
+                <h4>ℹ️ Informações do Processamento</h4>
+                <p id="method-info"></p>
+                <p id="time-info"></p>
+                <div id="confidence-info" style="display: none;">
+                    <p>Confiança: <span id="confidence-text"></span></p>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" id="confidence-fill"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="message-area"></div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('file-input');
+        const loading = document.getElementById('loading');
+        const previewArea = document.getElementById('preview-area');
+        const originalImage = document.getElementById('original-image');
+        const processedImage = document.getElementById('processed-image');
+        const messageArea = document.getElementById('message-area');
+        const methodInfo = document.getElementById('method-info');
+        const timeInfo = document.getElementById('time-info');
+        const aiStatus = document.getElementById('ai-status');
+        const aiCapabilities = document.getElementById('ai-capabilities');
+        const confidenceInfo = document.getElementById('confidence-info');
+        const confidenceText = document.getElementById('confidence-text');
+        const confidenceFill = document.getElementById('confidence-fill');
+
+        // Load AI status on page load
+        window.addEventListener('load', loadAIStatus);
+
+        // Drag and drop functionality
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', handleDragOver);
+        uploadArea.addEventListener('dragleave', handleDragLeave);
+        uploadArea.addEventListener('drop', handleDrop);
+        fileInput.addEventListener('change', handleFileSelect);
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                processFile(files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                processFile(file);
+            }
+        }
+
+        function processFile(file) {
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            if (!allowedTypes.includes(file.type)) {
+                showMessage('Formato de arquivo não suportado. Use JPEG, JPG ou PNG.', 'error');
+                return;
+            }
+
+            // Validate file size (10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                showMessage('Arquivo muito grande. Máximo permitido: 10MB.', 'error');
+                return;
+            }
+
+            uploadImage(file);
+        }
+
+        async function uploadImage(file) {
+            const startTime = Date.now();
+            
+            // Show loading
+            loading.style.display = 'block';
+            previewArea.style.display = 'none';
+            messageArea.innerHTML = '';
+
+            // Create form data
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                const endTime = Date.now();
+                const processingTime = ((endTime - startTime) / 1000).toFixed(1);
+
+                if (result.success) {
+                    // Show results
+                    originalImage.src = result.originalImage;
+                    processedImage.src = result.processedImage;
+                    methodInfo.textContent = `Método utilizado: ${result.method}`;
+                    
+                    // Show timing info
+                    const serverTime = result.processingTime ? `${result.processingTime}ms` : 'N/A';
+                    timeInfo.textContent = `Tempo total: ${processingTime}s (servidor: ${serverTime})`;
+                    
+                    // Show confidence if available
+                    if (result.confidence) {
+                        confidenceText.textContent = `${Math.round(result.confidence * 100)}%`;
+                        confidenceFill.style.width = `${result.confidence * 100}%`;
+                        confidenceInfo.style.display = 'block';
+                    } else {
+                        confidenceInfo.style.display = 'none';
+                    }
+                    
+                    previewArea.style.display = 'block';
+                    
+                    if (result.error) {
+                        showMessage(result.error, 'warning');
+                    } else if (result.fallbackUsed) {
+                        showMessage('Processamento realizado com método alternativo.', 'warning');
+                    } else {
+                        showMessage('Imagem processada com sucesso usando IA!', 'success');
+                    }
+                } else {
+                    showMessage(`Erro ao processar imagem: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showMessage(`Erro de conexão: ${error.message}`, 'error');
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        async function loadAIStatus() {
+            try {
+                const response = await fetch('/ai-status');
+                const status = await response.json();
+                
+                let statusHtml = '';
+                
+                // remove.bg API status
+                const apiBadge = status.removeBackground.apiConfigured ? 
+                    (status.removeBackground.enabled ? 
+                        '<span class="ai-badge available">✅ Ativado</span>' : 
+                        '<span class="ai-badge unavailable">⚠️ Configurado mas desativado</span>') :
+                    '<span class="ai-badge unavailable">❌ Não configurado</span>';
+                statusHtml += `<p><strong>remove.bg API:</strong> ${apiBadge}</p>`;
+                
+                // Enhanced local processing status
+                const localBadge = status.enhancedLocal.available ? 
+                    '<span class="ai-badge available">✅ Disponível</span>' : 
+                    '<span class="ai-badge unavailable">❌ Indisponível</span>';
+                statusHtml += `<p><strong>Processamento Local Avançado:</strong> ${localBadge}</p>`;
+                statusHtml += `<p><small>${status.enhancedLocal.description}</small></p>`;
+                
+                aiCapabilities.innerHTML = statusHtml;
+                aiStatus.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Erro ao carregar status da IA:', error);
+            }
+        }
+
+        function showMessage(message, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type;
+            messageDiv.textContent = message;
+            messageArea.innerHTML = '';
+            messageArea.appendChild(messageDiv);
+        }
+    </script>
+</body>
+</html> 

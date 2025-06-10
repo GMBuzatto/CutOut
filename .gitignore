@@ -404,3 +404,216 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# ✂️ CutOut - GitIgnore File
+
+# ==============================================
+# 📦 Dependencies & Modules
+# ==============================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# ==============================================
+# 🏗️ Build & Distribution
+# ==============================================
+dist/
+build/
+*.tsbuildinfo
+.tsbuildinfo
+
+# ==============================================
+# 🔐 Environment & Configuration
+# ==============================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.backup
+
+# ==============================================
+# 📁 Application Specific Directories
+# ==============================================
+# Upload directories (temporary files)
+uploads/
+output/
+temp/
+tmp/
+
+# Cache directories
+.cache/
+.parcel-cache/
+
+# ==============================================
+# 📝 Logs & Runtime
+# ==============================================
+logs/
+*.log
+*.log.*
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ==============================================
+# 🔧 Editor & IDE Files
+# ==============================================
+# Visual Studio Code
+.vscode/
+!.vscode/settings.json.example
+!.vscode/launch.json.example
+!.vscode/extensions.json.example
+
+# JetBrains IDEs
+.idea/
+*.swp
+*.swo
+*~
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# ==============================================
+# 🖥️ Operating System Files
+# ==============================================
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+Icon?
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ==============================================
+# 🧪 Testing & Coverage
+# ==============================================
+coverage/
+*.lcov
+.nyc_output/
+.coverage/
+.pytest_cache/
+.cache/
+
+# ==============================================
+# 📚 Documentation Generated
+# ==============================================
+docs/_build/
+.docusaurus/
+
+# ==============================================
+# 🐳 Docker & Containers
+# ==============================================
+Dockerfile.local
+docker-compose.override.yml
+.dockerignore.local
+
+# ==============================================
+# 🔄 Package Managers
+# ==============================================
+# npm
+package-lock.json.backup
+npm-shrinkwrap.json
+
+# Yarn
+yarn.lock.backup
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# ==============================================
+# ⚡ TypeScript & Compilation
+# ==============================================
+*.d.ts.map
+*.js.map
+tsconfig.tsbuildinfo
+
+# ==============================================
+# 🔍 Analysis & Profiling
+# ==============================================
+.eslintcache
+.stylelintcache
+
+# ==============================================
+# 🚀 Deployment & CI/CD
+# ==============================================
+.vercel/
+.netlify/
+.deploy/
+
+# ==============================================
+# 🎯 Project Specific
+# ==============================================
+# API Keys backup
+*.key
+*.pem
+*.crt
+
+# Backup files
+*.backup
+*.bak
+*.old
+
+# Large files (should use Git LFS)
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Image processing temporary files
+*.tmp.png
+*.tmp.jpg
+*.tmp.jpeg
+*.processing.*
+
+# ==============================================
+# 🎨 Media Files (Large Examples)
+# ==============================================
+# Uncomment if you want to ignore example images
+# examples/images/*.jpg
+# examples/images/*.png
+# examples/large-files/
+
+# ==============================================
+# 📊 Monitoring & Analytics
+# ==============================================
+.monitoring/
+analytics/
+metrics/
+
+# ==============================================
+# 🔧 Utilities & Tools
+# ==============================================
+.tool-versions
+.nvmrc.local
+.node-version.local
